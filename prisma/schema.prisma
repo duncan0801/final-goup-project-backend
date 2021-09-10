@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+    provider          = "postgresql"
+    url               = env("DATABASE_URL")
+    shadowDatabaseUrl = env("SHADOW_URL")
+}
+
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["referentialActions"]
+}
+
+model User {
+    id              Int            @id @default(autoincrement())
+    firstName       String
+    lastName        String
+    avatar          String
+    username        String         @unique
+    password        String
+    counsellor_ID   Int?
+    appointments    Appointment[]
+    messages        Message[]
+    reviews         Review[]
+    conversation    Conversation?
+}
+
+model Counsellor {
+    id              Int            @id @default(autoincrement())
+    firstName       String
+    lastName        String
+    about           String
+    licensing       String
+    avatar          String
+    hourlyRate      Int
+    yearsExperience Int?
+    gender          String?
+    appointments    Appointment[]
+    messages        Message[]
+    reviews         Review[]
+    specialties     Service[]
+    languages       Language[]
+    Conversation    Conversation[]
+}
+
+model Language {
+    id          Int          @id @default(autoincrement())
+    language    String
+    counsellors Counsellor[]
+
+}
+
+model Service {
+    id          Int          @id @default(autoincrement())
+    name        String
+    counsellors Counsellor[]
+
+}
+
+model Review {
+    id            Int        @id @default(autoincrement())
+    date          String
+    content       String
+    user_ID       Int
+    counsellor_ID Int
+    user          User       @relation(fields: [user_ID], references: [id], onDelete: Cascade)
+    counsellor    Counsellor @relation(fields: [counsellor_ID], references: [id], onDelete: Cascade)
+}
+
+model Message {
+    id              Int          @id @default(autoincrement())
+    date            String
+    content         String
+    user_ID         Int? 
+    counsellor_ID   Int?
+    conversation_ID Int
+    user            User?        @relation(fields: [user_ID], references: [id])
+    counsellor      Counsellor?  @relation(fields: [counsellor_ID], references: [id])
+    conversation    Conversation @relation(fields: [conversation_ID], references: [id])
+}
+
+model Conversation {
+    id            Int        @id @default(autoincrement())
+    user_ID       Int
+    counsellor_ID Int
+    user          User       @relation(fields: [user_ID], references: [id], onDelete: Cascade)
+    counsellor    Counsellor @relation(fields: [counsellor_ID], references: [id], onDelete: Cascade)
+    Message       Message[]
+}
+
+model Appointment {
+    id            Int        @id @default(autoincrement())
+    date          String 
+    time          String 
+    user_ID       Int 
+    counsellor_ID Int
+    @@unique([date, time])
+    user          User       @relation(fields: [user_ID], references: [id], onDelete: Cascade)
+    counsellor    Counsellor @relation(fields: [counsellor_ID], references: [id], onDelete: Cascade)
+}
+
+model Faq {
+    id       Int    @id @default(autoincrement())
+    question String
+    answer   String
+}
