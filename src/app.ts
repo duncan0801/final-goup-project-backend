@@ -29,7 +29,7 @@ const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "https://distracted-sammet-a52dfe.netlify.app", credentials: true }));
 app.use(cookieParser());
 
 //Routes
